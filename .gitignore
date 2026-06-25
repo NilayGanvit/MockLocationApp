@@ -1,0 +1,25 @@
+# Gradle files and build folders
+.gradle/
+build/
+/*/build/
+local.properties
+
+# IDE and editor configurations
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.navigation/
+captures/
+.externalNativeBuild/
+.cxx/
+cmake-build-*/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log

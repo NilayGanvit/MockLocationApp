@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mock Location</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="accuracy">Accuracy (m)</string>
+    <string name="set_location">Set Location</string>
+    <string name="start">Start Mock</string>
+    <string name="stop">Stop Mock</string>
+    <string name="london">London</string>
+    <string name="manchester">Manchester</string>
+    <string name="edinburgh">Edinburgh</string>
+    <string name="cardiff">Cardiff</string>
+    <string name="location_set">Location Set</string>
+    <string name="error">Error</string>
+    <string name="uk_presets">UK Presets</string>
+    <string name="custom">Custom</string>
+</resources>
