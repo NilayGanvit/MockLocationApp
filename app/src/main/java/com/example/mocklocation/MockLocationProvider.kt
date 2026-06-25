@@ -32,7 +32,7 @@ class MockLocationProvider(private val context: Context) {
                 this.accuracy = accuracy
                 this.altitude = 0.0
                 this.time = System.currentTimeMillis()
-                this.elapsedRealtimeNanos = System.nanoTime()
+                this.elapsedRealtimeNanos = android.os.SystemClock.elapsedRealtimeNanos()
             }
 
             // Set the mock location using the test provider
@@ -47,23 +47,27 @@ class MockLocationProvider(private val context: Context) {
     fun startMockProvider() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                // Ensure the test provider exists
-                if (!locationManager.getProviders(false).contains(LocationManager.GPS_PROVIDER)) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        locationManager.addTestProvider(
-                            LocationManager.GPS_PROVIDER,
-                            false,
-                            false,
-                            false,
-                            false,
-                            true,
-                            true,
-                            true,
-                            android.location.Criteria.POWER_LOW,
-                            android.location.Criteria.ACCURACY_FINE
-                        )
-                    }
+                try {
+                    locationManager.removeTestProvider(LocationManager.GPS_PROVIDER)
+                } catch (e: Exception) {
+                    // Ignore if it was not already a test provider
                 }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    locationManager.addTestProvider(
+                        LocationManager.GPS_PROVIDER,
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        true,
+                        true,
+                        android.location.Criteria.POWER_LOW,
+                        android.location.Criteria.ACCURACY_FINE
+                    )
+                }
+
                 // Enable the test provider
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     locationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, true)

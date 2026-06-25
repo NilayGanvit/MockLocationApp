@@ -37,6 +37,35 @@ class MainActivity : ComponentActivity() {
         // Request permissions
         requestLocationPermissions()
 
+        val filter = android.content.IntentFilter("com.example.mocklocation.SET_LOCATION")
+        val receiver = object : android.content.BroadcastReceiver() {
+            override fun onReceive(context: android.content.Context?, intent: android.content.Intent?) {
+                if (intent != null) {
+                    val lat = intent.getDoubleExtra("lat", 0.0).takeIf { it != 0.0 }
+                        ?: intent.getStringExtra("lat")?.toDoubleOrNull()
+                        ?: 51.5074
+                    val lon = intent.getDoubleExtra("lon", 0.0).takeIf { it != 0.0 }
+                        ?: intent.getStringExtra("lon")?.toDoubleOrNull()
+                        ?: -0.1278
+                    val acc = intent.getFloatExtra("acc", 0f).takeIf { it != 0f }
+                        ?: intent.getStringExtra("acc")?.toFloatOrNull()
+                        ?: 25f
+                    try {
+                        mockLocationProvider.startMockProvider()
+                        mockLocationProvider.setMockLocation(lat, lon, acc)
+                        android.util.Log.d("MockLocation", "Broadcast set location: $lat, $lon, $acc")
+                    } catch (e: Exception) {
+                        android.util.Log.e("MockLocation", "Error setting via broadcast: ${e.message}")
+                    }
+                }
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(receiver, filter, android.content.Context.RECEIVER_EXPORTED)
+        } else {
+            registerReceiver(receiver, filter)
+        }
+
         setContent {
             MaterialTheme {
                 MockLocationApp(mockLocationProvider, ::requestLocationPermissions)
@@ -47,8 +76,7 @@ class MainActivity : ComponentActivity() {
     private fun requestLocationPermissions() {
         val permissions = arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_MOCK_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION
         )
 
         val needsRequest = permissions.any {
@@ -164,7 +192,7 @@ fun MockLocationApp(
         }
 
         item {
-            Text("UK Presets", style = MaterialTheme.typography.labelMedium)
+            Text("UK Presets", style = MaterialTheme.typography.caption1)
         }
 
         items(mockLocationProvider.ukPresets) { (lat, lon, name) ->
@@ -183,7 +211,7 @@ fun MockLocationApp(
                 },
                 modifier = Modifier.size(width = 100.dp, height = 40.dp)
             ) {
-                Text(name, style = MaterialTheme.typography.labelSmall)
+                Text(name, style = MaterialTheme.typography.caption2)
             }
         }
     }
