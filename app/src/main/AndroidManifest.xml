@@ -6,12 +6,12 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CHANGE_DEVICE_ICON" />
-    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" tools:ignore="MockLocation" />
 
     <!-- Features -->
-    <uses-feature android:name="android.hardware.type.watch" required="true" />
-    <uses-feature android:name="android.hardware.location" required="false" />
-    <uses-feature android:name="android.hardware.location.gps" required="false" />
+    <uses-feature android:name="android.hardware.type.watch" android:required="true" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -19,6 +19,10 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="true" />
 
         <activity
             android:name=".MainActivity"

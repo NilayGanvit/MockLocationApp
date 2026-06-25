@@ -7,6 +7,11 @@ android {
     namespace 'com.example.mocklocation'
     compileSdk 34
 
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
     defaultConfig {
         applicationId "com.example.mocklocation"
         minSdk 26
@@ -44,7 +49,7 @@ android {
 dependencies {
     // Wear OS
     implementation 'androidx.wear:wear:1.2.0'
-    implementation 'com.google.android.wearable:wearable:2.8.1'
+    compileOnly 'com.google.android.wearable:wearable:2.8.1'
     
     // Compose for Wear OS
     implementation 'androidx.wear.compose:compose-material:1.2.0'

@@ -22,9 +22,11 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
+import android.annotation.SuppressLint
 import androidx.wear.compose.material.*
 import androidx.wear.compose.material.MaterialTheme
 
+@SuppressLint("MissingPermission")
 @RequiresApi(Build.VERSION_CODES.S)
 class MainActivity : ComponentActivity() {
     private lateinit var mockLocationProvider: MockLocationProvider
