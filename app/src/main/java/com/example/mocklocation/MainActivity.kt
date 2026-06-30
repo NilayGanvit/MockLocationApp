@@ -119,101 +119,127 @@ fun MockLocationApp(
     ScalingLazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp),
+            .padding(horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = PaddingValues(8.dp)
+        contentPadding = PaddingValues(
+            top = 4.dp,
+            bottom = 90.dp,
+            start = 8.dp,
+            end = 8.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+        autoCentering = null
     ) {
         item {
-            Text("Mock Location", style = MaterialTheme.typography.title3)
-        }
-
-        item {
-            OutlinedTextField(
-                value = latitude,
-                onValueChange = { latitude = it },
-                label = { Text("Lat") },
-                modifier = Modifier.width(120.dp)
-            )
-        }
-
-        item {
-            OutlinedTextField(
-                value = longitude,
-                onValueChange = { longitude = it },
-                label = { Text("Lon") },
-                modifier = Modifier.width(120.dp)
-            )
-        }
-
-        item {
-            OutlinedTextField(
-                value = accuracy,
-                onValueChange = { accuracy = it },
-                label = { Text("Acc") },
-                modifier = Modifier.width(120.dp)
-            )
-        }
-
-        item {
-            Button(
-                onClick = {
-                    try {
-                        val lat = latitude.text.toDoubleOrNull() ?: 51.5074
-                        val lon = longitude.text.toDoubleOrNull() ?: -0.1278
-                        val acc = accuracy.text.toFloatOrNull() ?: 25f
-
-                        mockLocationProvider.startMockProvider()
-                        mockLocationProvider.setMockLocation(lat, lon, acc)
-                        isMocking = true
-                        statusMessage = "Location Set"
-                    } catch (e: Exception) {
-                        statusMessage = "Error: ${e.message}"
-                    }
-                },
-                modifier = Modifier.size(width = 100.dp, height = 40.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Set")
+                Text("Mock Location", style = MaterialTheme.typography.title3)
+                Text(statusMessage, style = MaterialTheme.typography.caption2)
             }
         }
 
         item {
-            Button(
-                onClick = {
-                    mockLocationProvider.stopMockProvider()
-                    isMocking = false
-                    statusMessage = "Stopped"
-                },
-                modifier = Modifier.size(width = 100.dp, height = 40.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Stop")
+                OutlinedTextField(
+                    value = accuracy,
+                    onValueChange = { accuracy = it },
+                    label = { Text("Acc") },
+                    modifier = Modifier.weight(1f)
+                )
+                Button(
+                    onClick = {
+                        try {
+                            val lat = latitude.text.toDoubleOrNull() ?: 51.5074
+                            val lon = longitude.text.toDoubleOrNull() ?: -0.1278
+                            val acc = accuracy.text.toFloatOrNull() ?: 25f
+
+                            mockLocationProvider.startMockProvider()
+                            mockLocationProvider.setMockLocation(lat, lon, acc)
+                            isMocking = true
+                            statusMessage = "Set"
+                        } catch (e: Exception) {
+                            statusMessage = "Err"
+                        }
+                    },
+                    modifier = Modifier.weight(0.9f).height(40.dp)
+                ) {
+                    Text("Set", style = MaterialTheme.typography.caption2)
+                }
+                Button(
+                    onClick = {
+                        mockLocationProvider.stopMockProvider()
+                        isMocking = false
+                        statusMessage = "Stop"
+                    },
+                    modifier = Modifier.weight(0.9f).height(40.dp)
+                ) {
+                    Text("Stop", style = MaterialTheme.typography.caption2)
+                }
             }
         }
 
         item {
-            Text(statusMessage, style = MaterialTheme.typography.caption1)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                OutlinedTextField(
+                    value = latitude,
+                    onValueChange = { latitude = it },
+                    label = { Text("Lat") },
+                    modifier = Modifier.weight(1f)
+                )
+                OutlinedTextField(
+                    value = longitude,
+                    onValueChange = { longitude = it },
+                    label = { Text("Lon") },
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
 
         item {
+            Spacer(modifier = Modifier.height(2.dp))
             Text("Country Presets", style = MaterialTheme.typography.caption1)
         }
 
-        items(mockLocationProvider.countryPresets) { (lat, lon, name) ->
-            Button(
-                onClick = {
-                    try {
-                        mockLocationProvider.startMockProvider()
-                        mockLocationProvider.setMockLocation(lat, lon, 25f)
-                        latitude = TextFieldValue(lat.toString())
-                        longitude = TextFieldValue(lon.toString())
-                        isMocking = true
-                        statusMessage = "$name Set"
-                    } catch (e: Exception) {
-                        statusMessage = "Error: ${e.message}"
+        val presetChunks = mockLocationProvider.countryPresets.chunked(2)
+        presetChunks.forEach { chunk ->
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    chunk.forEach { (lat, lon, name) ->
+                        Button(
+                            onClick = {
+                                try {
+                                    mockLocationProvider.startMockProvider()
+                                    mockLocationProvider.setMockLocation(lat, lon, 25f)
+                                    latitude = TextFieldValue(lat.toString())
+                                    longitude = TextFieldValue(lon.toString())
+                                    isMocking = true
+                                    statusMessage = name
+                                } catch (e: Exception) {
+                                    statusMessage = "Err"
+                                }
+                            },
+                            modifier = Modifier.weight(1f).height(36.dp)
+                        ) {
+                            Text(name, style = MaterialTheme.typography.caption2)
+                        }
                     }
-                },
-                modifier = Modifier.size(width = 100.dp, height = 40.dp)
-            ) {
-                Text(name, style = MaterialTheme.typography.caption2)
+                    if (chunk.size < 2) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
             }
         }
     }
