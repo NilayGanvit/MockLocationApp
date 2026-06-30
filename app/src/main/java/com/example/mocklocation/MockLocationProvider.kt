@@ -31,7 +31,14 @@ class MockLocationProvider(private val context: Context) {
         LocationManager.FUSED_PROVIDER
     )
 
-    fun setMockLocation(latitude: Double, longitude: Double, accuracy: Float = 25f) {
+    fun setMockLocation(
+        latitude: Double,
+        longitude: Double,
+        accuracy: Float = 25f,
+        altitude: Double = 150.0,
+        speed: Float = 0.0f,
+        bearing: Float = 0.0f
+    ) {
         val currentTime = System.currentTimeMillis()
         val elapsedRealtimeNanos = SystemClock.elapsedRealtimeNanos()
 
@@ -42,12 +49,19 @@ class MockLocationProvider(private val context: Context) {
                     this.latitude = latitude
                     this.longitude = longitude
                     this.accuracy = accuracy
-                    this.altitude = 0.0
+                    this.altitude = altitude
+                    this.speed = speed
+                    this.bearing = bearing
                     this.time = currentTime
                     this.elapsedRealtimeNanos = elapsedRealtimeNanos
                     
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         this.elapsedRealtimeUncertaintyNanos = 0.0
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        this.verticalAccuracyMeters = 1.0f
+                        this.speedAccuracyMetersPerSecond = 0.1f
+                        this.bearingAccuracyDegrees = 1.0f
                     }
                 }
 

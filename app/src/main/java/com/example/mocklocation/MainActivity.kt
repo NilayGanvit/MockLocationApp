@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.TextFieldDefaults
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.background
 
 @SuppressLint("MissingPermission")
 @RequiresApi(Build.VERSION_CODES.S)
@@ -43,25 +44,44 @@ class MainActivity : ComponentActivity() {
         // Request permissions
         requestLocationPermissions()
 
-        val filter = android.content.IntentFilter("com.example.mocklocation.SET_LOCATION")
+        val filter = android.content.IntentFilter().apply {
+            addAction("com.example.mocklocation.SET_LOCATION")
+            addAction("com.example.mocklocation.STOP_LOCATION")
+        }
         val receiver = object : android.content.BroadcastReceiver() {
             override fun onReceive(context: android.content.Context?, intent: android.content.Intent?) {
                 if (intent != null) {
-                    val lat = intent.getDoubleExtra("lat", 0.0).takeIf { it != 0.0 }
-                        ?: intent.getStringExtra("lat")?.toDoubleOrNull()
-                        ?: 51.5074
-                    val lon = intent.getDoubleExtra("lon", 0.0).takeIf { it != 0.0 }
-                        ?: intent.getStringExtra("lon")?.toDoubleOrNull()
-                        ?: -0.1278
-                    val acc = intent.getFloatExtra("acc", 0f).takeIf { it != 0f }
-                        ?: intent.getStringExtra("acc")?.toFloatOrNull()
-                        ?: 25f
-                    try {
-                        mockLocationProvider.startMockProvider()
-                        mockLocationProvider.setMockLocation(lat, lon, acc)
-                        android.util.Log.d("MockLocation", "Broadcast set location: $lat, $lon, $acc")
-                    } catch (e: Exception) {
-                        android.util.Log.e("MockLocation", "Error setting via broadcast: ${e.message}")
+                    val action = intent.action
+                    if (action == "com.example.mocklocation.STOP_LOCATION") {
+                        try {
+                            context?.let { ctx ->
+                                MockLocationService.stop(ctx)
+                            }
+                            android.util.Log.d("MockLocation", "Broadcast stop location received")
+                        } catch (e: Exception) {
+                            android.util.Log.e("MockLocation", "Error stopping via broadcast: ${e.message}")
+                        }
+                    } else {
+                        val lat = intent.getDoubleExtra("lat", 0.0).takeIf { it != 0.0 }
+                            ?: intent.getStringExtra("lat")?.toDoubleOrNull()
+                            ?: 51.5074
+                        val lon = intent.getDoubleExtra("lon", 0.0).takeIf { it != 0.0 }
+                            ?: intent.getStringExtra("lon")?.toDoubleOrNull()
+                            ?: -0.1278
+                        val acc = intent.getFloatExtra("acc", 0f).takeIf { it != 0f }
+                            ?: intent.getStringExtra("acc")?.toFloatOrNull()
+                            ?: 25f
+                        val jitter = intent.getBooleanExtra("jitter", false)
+                            || intent.getStringExtra("jitter")?.toBoolean() ?: false
+                        try {
+                            MockLocationService.isJitterEnabled = jitter
+                            context?.let { ctx ->
+                                MockLocationService.start(ctx, lat, lon, acc, "Set")
+                            }
+                            android.util.Log.d("MockLocation", "Broadcast set location: $lat, $lon, $acc, jitter: $jitter")
+                        } catch (e: Exception) {
+                            android.util.Log.e("MockLocation", "Error setting via broadcast: ${e.message}")
+                        }
                     }
                 }
             }
@@ -96,17 +116,20 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun requestLocationPermissions() {
-        val permissions = arrayOf(
+        val permissions = mutableListOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
 
         val needsRequest = permissions.any {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }
 
         if (needsRequest) {
-            ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE)
+            ActivityCompat.requestPermissions(this, permissions.toTypedArray(), LOCATION_PERMISSION_REQUEST_CODE)
         }
     }
 
@@ -133,8 +156,9 @@ fun MockLocationApp(
     var latitude by remember { mutableStateOf(TextFieldValue("51.5074")) }
     var longitude by remember { mutableStateOf(TextFieldValue("-0.1278")) }
     var accuracy by remember { mutableStateOf(TextFieldValue("25")) }
-    var isMocking by remember { mutableStateOf(false) }
-    var statusMessage by remember { mutableStateOf("Ready") }
+    val isMocking = MockLocationService.isRunning
+    val statusMessage = MockLocationService.currentLabel
+    val context = LocalContext.current
 
     ScalingLazyColumn(
         modifier = Modifier
@@ -190,12 +214,9 @@ fun MockLocationApp(
                             val lon = longitude.text.toDoubleOrNull() ?: -0.1278
                             val acc = accuracy.text.toFloatOrNull() ?: 25f
 
-                            mockLocationProvider.startMockProvider()
-                            mockLocationProvider.setMockLocation(lat, lon, acc)
-                            isMocking = true
-                            statusMessage = "Set"
+                            MockLocationService.start(context, lat, lon, acc, "Set")
                         } catch (e: Exception) {
-                            statusMessage = "Err"
+                            // Ignored
                         }
                     },
                     modifier = Modifier.weight(0.9f).height(40.dp)
@@ -204,14 +225,33 @@ fun MockLocationApp(
                 }
                 Button(
                     onClick = {
-                        mockLocationProvider.stopMockProvider()
-                        isMocking = false
-                        statusMessage = "Stop"
+                        MockLocationService.stop(context)
                     },
                     modifier = Modifier.weight(0.9f).height(40.dp)
                 ) {
                     Text("Stop", style = MaterialTheme.typography.caption2)
                 }
+            }
+        }
+
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Jitter",
+                    style = MaterialTheme.typography.caption1,
+                    color = MaterialTheme.colors.onBackground
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                androidx.compose.material.Switch(
+                    checked = MockLocationService.isJitterEnabled,
+                    onCheckedChange = { MockLocationService.isJitterEnabled = it }
+                )
             }
         }
 
@@ -271,14 +311,11 @@ fun MockLocationApp(
                         Button(
                             onClick = {
                                 try {
-                                    mockLocationProvider.startMockProvider()
-                                    mockLocationProvider.setMockLocation(lat, lon, 25f)
+                                    MockLocationService.start(context, lat, lon, 25f, name)
                                     latitude = TextFieldValue(lat.toString())
                                     longitude = TextFieldValue(lon.toString())
-                                    isMocking = true
-                                    statusMessage = name
                                 } catch (e: Exception) {
-                                    statusMessage = "Err"
+                                    // Ignored
                                 }
                             },
                             modifier = Modifier.weight(1f).height(36.dp)
@@ -286,7 +323,6 @@ fun MockLocationApp(
                             Text(name, style = MaterialTheme.typography.caption2)
                         }
                         if (name == "Netherlands") {
-                            val context = LocalContext.current
                             Button(
                                 onClick = {
                                     Toast.makeText(context, "comming soon", Toast.LENGTH_SHORT).show()
@@ -303,5 +339,6 @@ fun MockLocationApp(
                 }
             }
         }
+
     }
 }
