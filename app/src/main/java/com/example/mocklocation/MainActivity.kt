@@ -27,6 +27,8 @@ import androidx.wear.compose.material.*
 import androidx.wear.compose.material.MaterialTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.TextFieldDefaults
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 @SuppressLint("MissingPermission")
 @RequiresApi(Build.VERSION_CODES.S)
@@ -283,8 +285,19 @@ fun MockLocationApp(
                         ) {
                             Text(name, style = MaterialTheme.typography.caption2)
                         }
+                        if (name == "Netherlands") {
+                            val context = LocalContext.current
+                            Button(
+                                onClick = {
+                                    Toast.makeText(context, "comming soon", Toast.LENGTH_SHORT).show()
+                                },
+                                modifier = Modifier.weight(1f).height(36.dp)
+                            ) {
+                                Text("+", style = MaterialTheme.typography.caption2)
+                            }
+                        }
                     }
-                    if (chunk.size < 2) {
+                    if (chunk.size < 2 && chunk.none { it.third == "Netherlands" }) {
                         Spacer(modifier = Modifier.weight(1f))
                     }
                 }
