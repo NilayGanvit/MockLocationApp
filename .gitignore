@@ -23,3 +23,9 @@ Desktop.ini
 
 # Logs
 *.log
+
+# Keystore and local signing properties
+keystore.properties
+*.keystore
+*.jks
+
