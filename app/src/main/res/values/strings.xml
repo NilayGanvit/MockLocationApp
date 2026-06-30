@@ -7,12 +7,13 @@
     <string name="set_location">Set Location</string>
     <string name="start">Start Mock</string>
     <string name="stop">Stop Mock</string>
-    <string name="london">London</string>
-    <string name="manchester">Manchester</string>
-    <string name="edinburgh">Edinburgh</string>
-    <string name="cardiff">Cardiff</string>
+    <string name="india">India</string>
+    <string name="us">US</string>
+    <string name="uk">UK</string>
+    <string name="uae">UAE</string>
+    <string name="netherlands">Netherlands</string>
     <string name="location_set">Location Set</string>
     <string name="error">Error</string>
-    <string name="uk_presets">UK Presets</string>
+    <string name="country_presets">Country Presets</string>
     <string name="custom">Custom</string>
 </resources>

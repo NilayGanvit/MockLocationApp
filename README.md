@@ -5,11 +5,12 @@ A lightweight Android Wear OS app for injecting mock GPS locations on smartwatch
 ## Features
 
 - **Manual Coordinate Entry**: Set any latitude and longitude manually
-- **UK Presets**: Quick buttons for 4 major UK cities:
-  - London (51.5074, -0.1278)
-  - Manchester (53.4808, -2.2426)
-  - Edinburgh (55.9533, -3.1883)
-  - Cardiff (51.4816, -3.1791)
+- **Country Presets**: Quick buttons for capital cities of 5 countries:
+  - India (New Delhi: 28.6139, 77.2090)
+  - US (Washington D.C.: 38.8936, -77.0146)
+  - UK (London: 51.5074, -0.1278)
+  - UAE (Abu Dhabi: 24.4667, 54.3667)
+  - Netherlands (Amsterdam: 52.3740, 4.8897)
 - **Accuracy Control**: Adjustable accuracy (in meters) for realistic testing
 - **Simple Toggle**: Easy Start/Stop buttons for mock location injection
 
@@ -55,7 +56,7 @@ adb shell am start -n com.example.mocklocation/.MainActivity
 
 1. Open the app on your Wear OS device
 2. Choose one of these options:
-   - **Quick Presets**: Tap a UK city button to instantly set location
+   - **Quick Presets**: Tap a country button to instantly set location
    - **Manual Entry**: Edit latitude, longitude, and accuracy fields, then tap "Set"
 3. Tap "Stop" to disable mock location when done
 

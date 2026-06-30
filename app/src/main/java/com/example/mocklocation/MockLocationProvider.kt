@@ -16,12 +16,13 @@ class MockLocationProvider(private val context: Context) {
     private val locationManager: LocationManager =
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-    // UK location presets (latitude, longitude, name)
-    val ukPresets = listOf(
-        Triple(51.5074, -0.1278, "London"),
-        Triple(53.4808, -2.2426, "Manchester"),
-        Triple(55.9533, -3.1883, "Edinburgh"),
-        Triple(51.4816, -3.1791, "Cardiff")
+    // Country location presets (latitude, longitude, name)
+    val countryPresets = listOf(
+        Triple(28.6139, 77.2090, "India"),
+        Triple(38.8936, -77.0146, "US"),
+        Triple(51.5074, -0.1278, "UK"),
+        Triple(24.4667, 54.3667, "UAE"),
+        Triple(52.3740, 4.8897, "Netherlands")
     )
 
     private val providersToMock = listOf(

@@ -194,10 +194,10 @@ fun MockLocationApp(
         }
 
         item {
-            Text("UK Presets", style = MaterialTheme.typography.caption1)
+            Text("Country Presets", style = MaterialTheme.typography.caption1)
         }
 
-        items(mockLocationProvider.ukPresets) { (lat, lon, name) ->
+        items(mockLocationProvider.countryPresets) { (lat, lon, name) ->
             Button(
                 onClick = {
                     try {
