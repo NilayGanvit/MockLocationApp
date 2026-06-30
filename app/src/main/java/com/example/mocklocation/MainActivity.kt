@@ -25,6 +25,8 @@ import androidx.wear.compose.foundation.lazy.items
 import android.annotation.SuppressLint
 import androidx.wear.compose.material.*
 import androidx.wear.compose.material.MaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TextFieldDefaults
 
 @SuppressLint("MissingPermission")
 @RequiresApi(Build.VERSION_CODES.S)
@@ -70,7 +72,23 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MaterialTheme {
-                MockLocationApp(mockLocationProvider, ::requestLocationPermissions)
+                val wearColors = MaterialTheme.colors
+                androidx.compose.material.MaterialTheme(
+                    colors = androidx.compose.material.darkColors(
+                        primary = wearColors.primary,
+                        primaryVariant = wearColors.primaryVariant,
+                        secondary = wearColors.secondary,
+                        secondaryVariant = wearColors.secondaryVariant,
+                        background = wearColors.background,
+                        surface = wearColors.surface,
+                        onPrimary = wearColors.onPrimary,
+                        onSecondary = wearColors.onSecondary,
+                        onBackground = wearColors.onBackground,
+                        onSurface = wearColors.onSurface
+                    )
+                ) {
+                    MockLocationApp(mockLocationProvider, ::requestLocationPermissions)
+                }
             }
         }
     }
@@ -151,7 +169,17 @@ fun MockLocationApp(
                     value = accuracy,
                     onValueChange = { accuracy = it },
                     label = { Text("Acc") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        backgroundColor = MaterialTheme.colors.surface,
+                        focusedBorderColor = MaterialTheme.colors.primary,
+                        unfocusedBorderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.3f),
+                        textColor = MaterialTheme.colors.onSurface,
+                        cursorColor = MaterialTheme.colors.primary,
+                        focusedLabelColor = MaterialTheme.colors.primary,
+                        unfocusedLabelColor = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                    )
                 )
                 Button(
                     onClick = {
@@ -194,13 +222,33 @@ fun MockLocationApp(
                     value = latitude,
                     onValueChange = { latitude = it },
                     label = { Text("Lat") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        backgroundColor = MaterialTheme.colors.surface,
+                        focusedBorderColor = MaterialTheme.colors.primary,
+                        unfocusedBorderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.3f),
+                        textColor = MaterialTheme.colors.onSurface,
+                        cursorColor = MaterialTheme.colors.primary,
+                        focusedLabelColor = MaterialTheme.colors.primary,
+                        unfocusedLabelColor = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                    )
                 )
                 OutlinedTextField(
                     value = longitude,
                     onValueChange = { longitude = it },
                     label = { Text("Lon") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        backgroundColor = MaterialTheme.colors.surface,
+                        focusedBorderColor = MaterialTheme.colors.primary,
+                        unfocusedBorderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.3f),
+                        textColor = MaterialTheme.colors.onSurface,
+                        cursorColor = MaterialTheme.colors.primary,
+                        focusedLabelColor = MaterialTheme.colors.primary,
+                        unfocusedLabelColor = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                    )
                 )
             }
         }
